@@ -227,12 +227,21 @@ int main()
 
     std::shared_ptr<ResNet<BasicBlock>> model = resnet18(/*num_classes = */ 10);
 
-    std::cout << "Training Model..." << std::endl;
-    model = train_model(model, train_data_loader, test_data_loader, device,
-                        learning_rate, num_epochs);
-    std::cout << "Training Finished." << std::endl;
+    // check if model file already exists
+    if (!std::filesystem::exists(model_file_path))
+    {
+        std::cout << "Training Model..." << std::endl;
+        model = train_model(model, train_data_loader, test_data_loader, device,
+                            learning_rate, num_epochs);
+        std::cout << "Training Finished." << std::endl;
 
-    torch::save(model, model_file_path);
+        torch::save(model, model_file_path);
+    }
+    else
+    {
+        std::cout << "Model file exists. Loading model..." << std::endl;
+    }
+
     torch::load(model, model_file_path);
 
     const std::vector<int64_t> input_size{1, 3, 32, 32};
